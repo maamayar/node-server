@@ -13,69 +13,98 @@ function generateTaskId() {
   return taskId++;
 }
 
-function addTask() {
-  readlineInterface.question('Ingrese el nombre de la tarea: ', (indicator) => {
-    readlineInterface.question('Ingrese la descripción de la tarea: ', (description) => {
-      const task = {
-        id: generateTaskId(),
-        indicator,
-        description,
-        completed: false,
-      };
-      tasks.push(task);
-      console.log(chalk.green('Tarea agregada correctamente'));
-      console.log(`${task.id}. Título: ${task.indicator} Descripción: ${task.description}`);
-      showMenu();
+function findTaskById(id) {
+  return tasks.find(task => task.id === id);
+}
+
+function displayMenu() {
+  return new Promise((resolve, reject) => {
+    console.log(chalk.yellow('\n=== Menú 🔍 Lista de Tareas ==='));
+    console.log('1. Agregar tarea 📌');
+    console.log('2. Completar tarea ✅');
+    console.log('3. Eliminar tarea 🚫');
+    console.log('4. Ver lista de tareas 👀');
+    console.log('5. Salir 👋');
+
+    readlineInterface.question('Selecciona un número del menú 🕹️ ', (option) => {
+      resolve(option);
     });
   });
 }
 
-function deleteTask() {
+async function addTask() {
+  const indicator = await new Promise(resolve => {
+    readlineInterface.question('Ingrese el nombre de la tarea: ', resolve);
+  });
+
+  const description = await new Promise(resolve => {
+    readlineInterface.question('Ingrese la descripción de la tarea: ', resolve);
+  });
+
+  const task = {
+    id: generateTaskId(),
+    indicator,
+    description,
+    completed: false,
+  };
+
+  tasks.push(task);
+  console.log(chalk.green('Tarea agregada correctamente ✅'));
+  console.log(`${task.id}. Título: ${task.indicator} Descripción: ${task.description}`);
+}
+
+async function deleteTask() {
   if (tasks.length === 0) {
-    console.log(chalk.yellow('No hay tareas para eliminar.'));
-    showMenu();
+    console.log(chalk.yellow('💬 No hay tareas para eliminar 💬'));
     return;
   }
 
   showTasks();
 
-  readlineInterface.question('Ingrese el número de la tarea que desea eliminar: ', (index) => {
-    const taskId = parseInt(index);
-    const taskIndex = tasks.findIndex(task => task.id === taskId);
-
-    if (taskIndex === -1) {
-      console.log(chalk.red('❗ Tarea no encontrada. ❗'));
-      deleteTask();
-      return;
-    }
-
-    tasks.splice(taskIndex, 1);
-    console.log(chalk.green('Tarea eliminada correctamente 🚩 '));
-    showMenu();
+  const index = await new Promise(resolve => {
+    readlineInterface.question('Ingrese el número de la tarea que desea eliminar: ', resolve);
   });
-}
 
-function completeTask() {
-  if (tasks.length === 0) {
-    console.log(chalk.yellow('No hay tareas para marcar como completadas.'));
-    showMenu();
+  const taskId = parseInt(index);
+  const taskIndex = tasks.findIndex(task => task.id === taskId);
+
+  if (taskIndex === -1) {
+    console.log(chalk.red('❗ Tarea no encontrada. ❗'));
+    await deleteTask();
     return;
   }
 
-  readlineInterface.question('Ingrese el número de la tarea que desea marcar como completada: ', (id) => {
-    const taskId = parseInt(id);
-    const task = tasks.find(task => task.id === taskId);
+  tasks.splice(taskIndex, 1);
+  console.log(chalk.green('🗑️ Tarea eliminada correctamente 🗑️'));
+}
 
-    if (!task) {
-      console.log(chalk.red('❗ Tarea no encontrada. ❗'));
-      completeTask();
-      return;
-    }
+async function completeTask() {
+  if (tasks.length === 0) {
+    console.log(chalk.yellow('💬 No hay tareas para marcar como completadas 💬'));
+    return;
+  }
 
-    task.completed = true;
-    console.log(chalk.green('Tarea marcada como completada.'));
-    showMenu();
+  showTasks();
+
+  const id = await new Promise(resolve => {
+    readlineInterface.question('Ingrese el número de la tarea que desea marcar como completada: ', resolve);
   });
+
+  const taskId = parseInt(id);
+  const task = findTaskById(taskId);
+
+  if (!task) {
+    console.log(chalk.red('❗ Tarea no encontrada. ❗'));
+    await completeTask();
+    return;
+  }
+
+  if (task.completed) {
+    console.log(chalk.yellow('📢 Esta tarea ya está completada 📢'));
+  } else {
+    task.completed = true;
+    console.log(chalk.green('Tarea marcada como completada ✅ .'));
+  }
 }
 
 function showTasks() {
@@ -86,39 +115,36 @@ function showTasks() {
   });
 }
 
-function showMenu() {
-  console.log(chalk.yellow('\n=== Menú 🔍 Lista de Tareas ==='));
-  console.log('1. Agregar tarea 📌');
-  console.log('2. Completar tarea ✅');
-  console.log('3. Eliminar tarea 🚫');
-  console.log('4. Ver lista de tareas 👀');
-  console.log('5. Salir 👋');
+async function runTaskManager() {
+  console.log(chalk.bold.cyan('🪄✨ Bienvenid@ a tu lista de tareas 🪄✨'));
+  let option;
 
-  readlineInterface.question('Selecciona un número del menú 🕹️ ', (option) => {
+  do {
+    option = await displayMenu();
+
     switch (option) {
       case '1':
-        addTask();
+        await addTask();
         break;
       case '2':
-        completeTask();
+        await completeTask();
         break;
       case '3':
-        deleteTask();
+        await deleteTask();
         break;
       case '4':
         showTasks();
         break;
       case '5':
         console.log(chalk.yellow('👋 ¡Hasta pronto! 👋'));
-        readlineInterface.close();
         break;
       default:
         console.log(chalk.red('🚨 Opción inválida 🚨 Solo puede ingresar las opciones del menú: 1, 2, 3, 4, 5,'));
-        showMenu();
         break;
     }
-  });
+  } while (option !== '5');
+
+  readlineInterface.close();
 }
 
-console.log(chalk.bold.cyan('🪄✨ Bienvenid@ a tu lista de tareas 🪄✨'));
-showMenu();
+runTaskManager();
