@@ -9,103 +9,81 @@ const readlineInterface = readline.createInterface({
 const tasks = [];
 let taskId = 1;
 
+function generateTaskId() {
+  return taskId++;
+}
+
 function addTask() {
   readlineInterface.question('Ingrese el nombre de la tarea: ', (indicator) => {
     readlineInterface.question('Ingrese la descripción de la tarea: ', (description) => {
-      readlineInterface.question('🧐  ¿La tarea está completada? 🧐 (si/no): ', (completed) => {
-        const task = {
-          id: taskId,
-          indicator,
-          description,
-          completed: completed.toLowerCase() === 's' ? true : false,
-        };
-        tasks.push(task);
-        console.log(chalk.green('Tarea agregada correctamente'));
-        console.log (`${task.id}. ${task.indicator} - ${task.description}`); 
-         showMenu();
-      });
+      const task = {
+        id: generateTaskId(),
+        indicator,
+        description,
+        completed: false,
+      };
+      tasks.push(task);
+      console.log(chalk.green('Tarea agregada correctamente'));
+      console.log(`${task.id}. Título: ${task.indicator} Descripción: ${task.description}`);
+      showMenu();
     });
   });
 }
 
-function editTask() {
-    if (tasks.length === 0) {
-        console.log(chalk.yellow('No existen tareas para editar.'));
-        showMenu();
-        return;
-      }
-    
-      showTasks();
-    
-      readlineInterface.question('Ingrese el número de la tarea que desea modificar: ', (index) => {
-        const taskIndex = parseInt(index) - 1;
-        if (taskIndex < 0 || taskIndex >= tasks.length || isNaN(taskIndex)) {
-          console.log(chalk.red('Número de tarea inválido. '));
-          showMenu();
-          return;
-        }
-
-        readlineInterface.question('Ingrese la nueva descripción de la tarea: ', (description) => {
-          tasks[taskIndex].description = description;
-          console.log(chalk.green('Tarea modificada correctamente. 👍'));
-          showMenu();
-        });
-      });
-}
-
 function deleteTask() {
-    if (tasks.length === 0) {
-        console.log(chalk.yellow('No hay tareas para eliminar.'));
-        showMenu();
-        return;
-      }
-    
-      showTasks();
-    
-      readlineInterface.question('Ingrese el número de la tarea que desea eliminar: ', (index) => {
-        const taskIndex = parseInt(index) - 1;
-        if (taskIndex < 0 || taskIndex >= tasks.length || isNaN(taskIndex)) {
-          console.log(chalk.red('Número de tarea inválido.'));
-          deleteTask();
-          return;
-        }
-    
-        tasks.splice(taskIndex, 1);
-        console.log(chalk.green('Tarea eliminada correctamente. '));
-        showMenu();
-      });
+  if (tasks.length === 0) {
+    console.log(chalk.yellow('No hay tareas para eliminar.'));
+    showMenu();
+    return;
+  }
+
+  showTasks();
+
+  readlineInterface.question('Ingrese el número de la tarea que desea eliminar: ', (index) => {
+    const taskId = parseInt(index);
+    const taskIndex = tasks.findIndex(task => task.id === taskId);
+
+    if (taskIndex === -1) {
+      console.log(chalk.red('❗ Tarea no encontrada. ❗'));
+      deleteTask();
+      return;
+    }
+
+    tasks.splice(taskIndex, 1);
+    console.log(chalk.green('Tarea eliminada correctamente 🚩 '));
+    showMenu();
+  });
 }
 
 function completeTask() {
-    if (tasks.length === 0) {
-        console.log(chalk.yellow('No hay tareas para marcar como completadas.'));
-        showMenu();
-        return;
-      }
-    
-      showTasks();
-    
-      readlineInterface.question('Ingrese el número de la tarea que desea marcar como completada: ', (index) => {
-        const taskIndex = parseInt(index) - 1;
-        if (taskIndex < 0 || taskIndex >= tasks.length || isNaN(taskIndex)) {
-          console.log(chalk.red('❗ Número de tarea inválido. ❗'));
-          completeTask();
-          return;
-        }
-    
-        tasks[taskIndex].completed = true;
-        console.log(chalk.green('Tarea marcada como completada.'));
-        showMenu();
-      });
+  if (tasks.length === 0) {
+    console.log(chalk.yellow('No hay tareas para marcar como completadas.'));
+    showMenu();
+    return;
+  }
+
+  readlineInterface.question('Ingrese el número de la tarea que desea marcar como completada: ', (id) => {
+    const taskId = parseInt(id);
+    const task = tasks.find(task => task.id === taskId);
+
+    if (!task) {
+      console.log(chalk.red('❗ Tarea no encontrada. ❗'));
+      completeTask();
+      return;
+    }
+
+    task.completed = true;
+    console.log(chalk.green('Tarea marcada como completada.'));
+    showMenu();
+  });
 }
 
 function showTasks() {
   console.log(chalk.blue('Lista de tareas:'));
   tasks.forEach((task) => {
-    const status = task.completed ? chalk.green('✅ Completada') : chalk.red('❌ Pendiente');
-  console.log(`${task.id}. ${status} ${task.indicator} - ${task.description}`);
+    const status = task.completed ? chalk.green('✅ Completada') : chalk.red('⏳ Pendiente');
+    console.log(`${task.id}. ${status} ${task.indicator} - ${task.description}`);
   });
-  showMenu();
 }
 
 function showMenu() {
@@ -116,7 +94,7 @@ function showMenu() {
   console.log('4. Ver lista de tareas 👀');
   console.log('5. Salir 👋');
 
-  readlineInterface.question(' Selecciona un número del menú 🕹️ ', (option) => {
+  readlineInterface.question('Selecciona un número del menú 🕹️ ', (option) => {
     switch (option) {
       case '1':
         addTask();
@@ -135,12 +113,12 @@ function showMenu() {
         readlineInterface.close();
         break;
       default:
-        console.log(chalk.red('🚨 Opción inválida 🚨'));
+        console.log(chalk.red('🚨 Opción inválida 🚨 Solo puede ingresar las opciones del menú: 1, 2, 3, 4, 5,'));
         showMenu();
+        break;
     }
   });
 }
 
-
-console.log(chalk.cyan('🪄✨ Bienvenid@ tu lista de tareas  🪄✨'));
+console.log(chalk.bold.cyan('🪄✨ Bienvenid@ a tu lista de tareas 🪄✨'));
 showMenu();
