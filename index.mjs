@@ -139,7 +139,7 @@ async function runTaskManager() {
         console.log(chalk.yellow('👋 ¡Hasta pronto! 👋'));
         break;
       default:
-        console.log(chalk.red('🚨 Opción inválida 🚨 Solo puede ingresar las opciones del menú: 1, 2, 3, 4, 5,'));
+        console.log(chalk.red('🚨 Opción inválida 🚨 Solo puede ingresar las opciones del menú: 1, 2, 3, 4, 5'));
         break;
     }
   } while (option !== '5');
