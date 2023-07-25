@@ -1,6 +1,6 @@
 # Lista de tareas con Node.js
 
-![Lista de tareas](task-list-node.png)
+![Lista de tareas](/images/task-list-node.png)
 
 ## Lista de tareas
 
@@ -10,25 +10,25 @@ Task List Node es una aplicación de línea de comandos que te permite gestionar
 
 1. Agregar tarea
 
-![Agregar tarea](add-task.png)
+![Agregar tarea](/images/add-task.png)
 
 Puedes agregar una nueva tarea a la lista ingresando su nombre e descripción. La tarea se asignará automáticamente un ID único y se marcará como pendiente.
 
 2.  Completar tarea
 
-![Completar tarea](complete-task.png)
+![Completar tarea](/images/complete-task.png)
 
 Puedes marcar una tarea como completada ingresando su número de identificación. Si la tarea ya está completada, recibirás una alerta indicando que la tarea ya se encuentra en estado "Completada".
 
 3. Eliminar tarea
 
-![Eliminar tarea](delete-task.png)
+![Eliminar tarea](/images/delete-task.png)
 
 Puedes eliminar una tarea de la lista ingresando su número de identificación. Si la tarea no existe en la lista, recibirás un mensaje de alerta informándote que la tarea no ha sido encontrada.
 
 4. Ver lista de tareas
 
-![Ver lista de tareas](show-tasks.png)
+![Ver lista de tareas](/images/show-tasks.png)
 
 Puedes ver la lista actual de tareas, junto con su estado (pendiente o completada), su identificación, nombre y descripción.
 
